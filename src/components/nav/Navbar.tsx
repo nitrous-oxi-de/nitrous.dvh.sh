@@ -1,3 +1,9 @@
+/**
+ * @file        src/components/nav/Navbar.tsx
+ * @author      David @dvhsh (https://dvh.sh)
+ * @author      Marc
+ * @description Navigation bar component
+ */
 import { motion }  from "framer-motion";
 import React       from "react";
 
@@ -13,7 +19,7 @@ const SimpleFloatingNav = () => {
   return (
       <div>
           <nav
-              className="fixed left-[50%] top-8 flex w-fit -translate-x-[50%] items-center gap-6 rounded-lg border-[1px] border-sky-900 bg-sky-500 p-3 text-sm text-zinc-950 fill-white">
+              className="fixed z-50 left-[50%] top-8 flex w-fit -translate-x-[50%] items-center gap-6 rounded-lg border-[1px] border-sky-900 bg-sky-500/90 p-3 text-sm text-zinc-950 fill-white shadow-lg shadow-sky-500/20 backdrop-blur-md">
               
               <NavLink redirect={'/'}        > Home    </NavLink>
               <NavLink redirect={'/search'}  > Search  </NavLink>

@@ -1,9 +1,14 @@
+/**
+ * @file        src/app/terms/page.tsx
+ * @author      David @dvhsh (https://dvh.sh)
+ * @description Terms of Service page
+ */
 'use client';
 
 import React, { ReactNode, useState } from "react";
 
-import Navbar                         from "@components/Navbar";
-import Footer                         from "@components/Footer";
+import Navbar                         from "@/components/nav/Navbar";
+import Footer                         from "@/components/nav/Footer";
 
 const terms = [
   {
@@ -53,12 +58,14 @@ const terms = [
 const Terms = () => {
   return (
     <MouseMoveLineDrawing>
-      <section className="min-h-screen flex flex-col justify-between py-20 px-4 sm:px-8 lg:px-16 overflow-x-hidden relative">
+      <div className="min-h-screen flex flex-col relative">
 
-        {/* Background and Layout */}
-        <div className="absolute inset-0 z-[-2] bg-[#000000] bg-[radial-gradient(#ffffff33_1px,black_1px)] bg-[size:20px_20px]" />
+        {/* Background - Fixed to viewport */}
+        <div className="fixed inset-0 z-[-2] h-full w-full bg-[#000000] bg-[radial-gradient(#ffffff33_1px,black_1px)] bg-[size:20px_20px]" />
 
-        <div className="max-w-3xl mx-auto flex flex-col gap-4">
+        <Navbar />
+
+        <main className="flex-grow w-full max-w-3xl mx-auto px-4 sm:px-8 lg:px-16 pt-32 pb-20 flex flex-col gap-8">
           <h3 className="text-5xl font-bold mb-6 text-purple-300 text-center">Terms of Service</h3>
           
           {terms.map((term) => (
@@ -71,12 +78,11 @@ const Terms = () => {
           <span className="pt-4 text-4xl font-black text-purple-300 text-center">
             By using this service, you agree to these terms.
           </span>
-        </div>
+        </main>
 
-        <Navbar />
         <Footer />
 
-      </section>
+      </div>
     </MouseMoveLineDrawing>
   );
 };

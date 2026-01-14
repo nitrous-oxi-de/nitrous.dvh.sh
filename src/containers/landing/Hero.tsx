@@ -1,9 +1,14 @@
+/**
+ * @file        src/containers/landing/Hero.tsx
+ * @author      David @dvhsh (https://dvh.sh)
+ * @description Search page
+ */
 import React               from "react";
 
 import { useRouter }       from "next/navigation";
 import { Button  }         from "@nextui-org/react";
 
-import { BackgroundBeams } from "@components/ui/beams";
+import { BackgroundBeams } from "@/components/ui/beams";
 
 const Landing = () => {
   

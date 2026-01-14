@@ -1,8 +1,13 @@
+/**
+ * @file        src/app/privacy/page.tsx
+ * @author      David @dvhsh (https://dvh.sh)
+ * @description Privacy Policy page
+ */
 'use client';
 
 import React, { Dispatch, SetStateAction, useState } from "react";
-import Navbar                                        from "@components/Navbar";
-import Footer                                        from "@components/Footer";
+import Navbar                                        from "@/components/nav/Navbar";
+import Footer                                        from "@/components/nav/Footer";
 
 const solutions = [
   {
@@ -41,12 +46,14 @@ const Privacy = () => {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section className="min-h-screen py-20 relative">
+    <div className="min-h-screen flex flex-col relative">
 
-      {/* Background and Layout */}
-      <div className="absolute inset-0 z-[-2] h-full bg-[#000000] bg-[radial-gradient(#ffffff33_1px,black_1px)] bg-[size:20px_20px]" />
+      {/* Background - Fixed to viewport */}
+      <div className="fixed inset-0 z-[-2] h-full w-full bg-[#000000] bg-[radial-gradient(#ffffff33_1px,black_1px)] bg-[size:20px_20px]" />
 
-      <div className="w-full max-w-3xl mx-auto flex flex-col gap-8">
+      <Navbar />
+
+      <main className="flex-grow w-full max-w-3xl mx-auto px-4 pt-32 pb-20 flex flex-col gap-8">
         <h3 className="text-5xl font-bold mb-8 pt-2 text-purple-300 text-center">Privacy Policy</h3>
         <div className="flex flex-col gap-4">
           {solutions.map((solution) => (
@@ -59,11 +66,10 @@ const Privacy = () => {
             />
           ))}
         </div>
-      </div>
+      </main>
 
-      <Navbar />
       <Footer />
-    </section>
+    </div>
   );
 };
 

@@ -1,8 +1,13 @@
+/**
+ * @file        src/components/ui/cards.tsx
+ * @author      Marc
+ * @description UI Card components with interactive effects
+ */
 "use client";
 import { useMotionValue } from "framer-motion";
 import React, { useState, useEffect } from "react";
 import { useMotionTemplate, motion } from "framer-motion";
-import { cn } from "@/app/utils/cn";
+import { cn } from "@/utils/cn";
 
 export const EvervaultCard = ({
   text,

@@ -1,10 +1,7 @@
-/*
- * @file        app/api/health/route.ts
+/**
+ * @file        src/app/api/health/route.ts
  * @author      David @dvhsh (https://dvh.sh)
- * @description Simple health check endpoint using App Router
- *
- * @project     loom.software
- * @created     Feb 23, 2025
+ * @description Health check API route
  */
 
 import { NextResponse } from 'next/server';
@@ -14,8 +11,6 @@ export async function GET() {
     {
       status: 'healthy',
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV,
-      version: process.env.npm_package_version,
     },
     { status: 200 }
   );

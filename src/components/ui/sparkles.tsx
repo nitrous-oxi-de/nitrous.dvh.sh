@@ -1,3 +1,8 @@
+/**
+ * @file        src/components/ui/sparkles.tsx
+ * @author      Marc
+ * @description Sparkles particle effect component
+ */
 "use client";
 import type { NextPage } from "next";
 import React from "react";
@@ -5,7 +10,7 @@ import { useEffect, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import type { Container, Engine } from "@tsparticles/engine";
 import { loadSlim } from "@tsparticles/slim";
-import { cn } from "@/app/utils/cn";
+import { cn } from "@/utils/cn";
 import { motion, useAnimation } from "framer-motion";
 
 type ParticlesProps = {

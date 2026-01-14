@@ -1,3 +1,9 @@
+/**
+ * @file        src/app/layout.tsx
+ * @author      David @dvhsh (https://dvh.sh)
+ * @description Primary layout
+ */
+
 import './globals.css'
 
 import { NextUIProvider } from "@nextui-org/react";
@@ -23,14 +29,14 @@ export default function RootLayout({
         <meta charSet="UTF-8" />
         <meta name="subject" content="Open-source OSINT Investigation Suite" />
         <meta name="keywords" content="OSINT, free, open-source, lookup, search, NITROUS, nitrousoxide, nitrous-oxide, email, username, phone, domain, IP" />
-        <meta name="author" content="Haruhime Holdings" />
-        <meta name="copyright" content="Haruhime Holdings LLC" />
+        <meta name="author" content="David @dvhsh" />
+        <meta name="copyright" content="David @dvhsh" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="robots" content="index, follow" />
         <meta name="revised" content="Thursday, Aug 1st, 2024, 10:50 am" />
         <meta property="og:title" content="OSINT - NITROUS" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://nitrous-oxi.de/" />
+        <meta property="og:url" content="https://nitrous.dvh.sh/" />
         <meta property="og:site_name" content="NITROUS" />
         <meta property="og:description" content="NITROUS is an open-source OSINT investigation suite with an exposed RESTful API written for research purposes." />
         <meta name="twitter:title" content="OSINT - NITROUS" />

@@ -1,11 +1,17 @@
+/**
+ * @file        src/app/page.tsx
+ * @author      David @dvhsh (https://dvh.sh)
+ * @description Landing page
+ */
+
 'use client';
 
 import React   from "react";
 
-import Landing from "@containers/landing/Landing";
+import Landing from "@/containers/landing/Hero";
 
-import Navbar  from "@components/Navbar";
-import Footer  from "@components/Footer";
+import Navbar  from "@/components/nav/Navbar";
+import Footer  from "@/components/nav/Footer";
 
 const Home = () => {
     return (

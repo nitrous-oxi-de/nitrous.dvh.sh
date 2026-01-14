@@ -1,215 +1,91 @@
+/**
+ * @file        src/app/search/page.tsx
+ * @author      David @dvhsh (https://dvh.sh)
+ * @description Search page
+ */
 'use client';
+import React, { SetStateAction, useEffect, useState } from 'react';
+import { Download, AlertCircle, Search as SearchIcon } from 'lucide-react';
 
-import React, {SetStateAction, useEffect, useState} from 'react';
+import { getFlavorTexts, getSearchCategories, queryOSINT, OSINTResult } from '@/lib/osint';
+import { FLAVOR_KEY_WORDS } from '@/lib/constants';
 
-import Navbar                                       from "@/app/components/Navbar";
-import Footer                                       from "@/app/components/Footer";
+import Navbar from "@/components/nav/Navbar";
+import Footer from "@/components/nav/Footer";
 
-const FLAVOR_KEY_WORDS = [
-    'effortlessly',
-    'beyond',
-    'osint',
-    'data',
-    'free',
-    'find',
-    'zero',
-    'full',
-    'web',
-    'no'
-];
+import { SearchSkeleton } from "@/components/skeletons/SearchSkeleton";
+import { ResultCard } from "@/components/card/ResultCard";
+import { BubbleText } from "@/components/text/BubbleText";
 
-const BubbleText = () => {
-    useEffect(() => {
-        const spans = document.querySelectorAll(".hover-text span") as NodeListOf<HTMLSpanElement>;
-
-        spans.forEach((span) => {
-            span.addEventListener("mouseenter", function (this: typeof span) {
-                this.style.fontWeight = "900";
-                this.style.color = "rgb(238, 242, 255)";
-
-                const leftNeighbor = this.previousElementSibling as HTMLSpanElement;
-                const rightNeighbor = this.nextElementSibling as HTMLSpanElement;
-
-                if (leftNeighbor) {
-                    leftNeighbor.style.fontWeight = "500";
-                    leftNeighbor.style.color = "rgb(199, 210, 254)";
-                }
-                if (rightNeighbor) {
-                    rightNeighbor.style.fontWeight = "500";
-                    rightNeighbor.style.color = "rgb(199, 210, 254)";
-                }
-            });
-
-            span.addEventListener("mouseleave", function (this: typeof span) {
-                this.style.fontWeight = "100";
-                this.style.color = "rgb(165, 180, 252)";
-
-                const leftNeighbor = this.previousElementSibling as HTMLSpanElement;
-                const rightNeighbor = this.nextElementSibling as HTMLSpanElement;
-
-                if (leftNeighbor) {
-                    leftNeighbor.style.fontWeight = "100";
-                    leftNeighbor.style.color = "rgb(165, 180, 252)";
-                }
-
-                if (rightNeighbor) {
-                    rightNeighbor.style.fontWeight = "100";
-                    rightNeighbor.style.color = "rgb(165, 180, 252)";
-                }
-            });
-        });
-    }, []);
-
-    return (
-        <h2 className="hover-text text-center text-5xl font-thin text-[#331E84]">
-            <Text>NITROUS</Text>
-        </h2>
-    );
-};
-
-const Text = ({ children }: { children: string }) => {
-    return (
-        <>
-            {children.split("").map((child, idx) => (
-                <span
-                    style={{
-                        transition: "0.35s font-weight, 0.35s color",
-                    }}
-                    key={idx}
-                >
-                    {child}
-                </span>
-            ))}
-        </>
-    );
-};
-
-/*
-    @type function
-    @returns : array of strings
-    @desc    : gets the categories from the apis main indexing endpoint
- */
-const getButtonCategories = async () => {
-    let categories: string[] = [];
-
-    const res = await fetch('https://osint.dvh.sh/');
-
-    // returns an array of objects, each one has a 'category' property which we use to form our list
-    const data = await res.json();
-    data.forEach((obj: { category: string }) => {
-        categories.push(obj.category)
-    });
-
-    return categories;
-}
-
-/*
-    @type function
-    @returns : array of strings
-    @desc    : gets flavor texts out of the assets repo
- */
-const getFlavorTexts = async () => {
-    let flavors: string[] = [];
-
-    const res = await fetch('https://raw.githubusercontent.com/nitrous-oxi-de/.github/main/assets/txt/flavors.txt');
-    const data = await res.text();
-
-    // split by new line
-    const lines = data.split('\n');
-    lines.forEach((line: string) => {
-        flavors.push(line);
-    });
-
-    // shuffle the array
-    flavors.sort(() => Math.random() - 0.5);
-
-    return flavors;
-}
-
-/*
-    @type function
-    @param query    : string
-    @param category : string
-    @returns        : array of objects [{name: string, data: object}]
-    @desc           : queries the api and returns the data
- */
-const queryAPI = async (query: string, category: string) => {
-    const res = await fetch(`https://osint.dvh.sh/${category}?query=${query}`);
-    return await res.json();
-}
-
-// Main Search Component
 export default function Search() {
 
     const [flavorTexts, setFlavorTexts]           = useState<string[]>(['']);
-
-    const [errorMessage, setErrorMessage]         = useState(null);
+    const [errorMessage, setErrorMessage]         = useState<string | null>(null);
     const [loading, setLoading]                   = useState(false);
-
     const [buttonCategories, setButtonCategories] = useState<string[]>([]);
-    const [selectedButton, setSelectedButton]     = useState('Email');
-
-    const [results, setResults]                   = useState<any[]>([]);
+    const [selectedButton, setSelectedButton]     = useState('Username');
+    const [results, setResults]                   = useState<OSINTResult[]>([]);
     const [query, setQuery]                       = useState('');
 
     const handleSearch = async () => {
-        let data: any[] = [];
+        if (!query.trim()) return;
 
-        setLoading(true); setErrorMessage(null); setResults([]);
+        setLoading(true); 
+        setErrorMessage(null); 
+        setResults([]);
 
-        const res = await queryAPI(query, selectedButton);
-
-        if (res.error) { setErrorMessage(res.error); }
-
-        else if (res.status === 400) { setErrorMessage(res.data); }
-
-        else {
-            // map the objects returned by the api
-            res.forEach((obj: { name: string; data: any; }) => {
-
-                // if the module returned a 200 status code, add it to the data array
-                if (obj.data.status === 200) { data.push({name: obj.name, data: obj.data}) }
-            });
-
-            const timestamp = new Date().toISOString().replace(/:/g, '-');
-            const blob      = new Blob([JSON.stringify(data)], { type: 'application/json' });
-            const url       = URL.createObjectURL(blob);
-            const a         = document.createElement('a');
-
-            a.download      = `${query}-${timestamp}.json`;
-            a.href          = url;
-
-            a.click(); a.remove();
-
-           setResults(data);
+        try {
+            const data = await queryOSINT(query, selectedButton);
+            
+            if (data.length === 0) {
+                setErrorMessage("No results found.");
+            } else {
+                setResults(data);
+            }
+        } catch (error: any) {
+            setErrorMessage(error.message || "Failed to connect to API.");
         }
-
         setLoading(false);
     }
 
-    // TODO: look into SWR for data fetching
+    const downloadResults = () => {
+        const timestamp = new Date().toISOString().replace(/:/g, '-');
+        const blob      = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+        const url       = URL.createObjectURL(blob);
+        const a         = document.createElement('a');
+
+        a.download      = `${query}-${timestamp}.json`;
+        a.href          = url;
+        a.click(); a.remove();
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') handleSearch();
+    };
+
     useEffect(() => {
         getFlavorTexts().then((res) => setFlavorTexts(res));
-        getButtonCategories().then((res) => setButtonCategories(res));
+        getSearchCategories().then((res) => setButtonCategories(res));
     }, []);
 
     const handleButtonChange = (name: SetStateAction<string>) => {
-      if (!loading)
-        setSelectedButton(name);
+      if (!loading) setSelectedButton(name);
     }
 
     return (
         <div>
             <Navbar />
-            {/* background and layout */}
-            <div className="absolute top-0 z-[-2] h-screen w-screen bg-[#000000] bg-[radial-gradient(#ffffff33_1px,black_1px)] bg-[size:20px_20px]"></div>
-            <div className="mx-auto w-screen h-screen px-6 pb-10 md:max-w-[720px] lg:max-w-[612px] flex flex-col justify-center gap-4">
+            
+            {/* Background Texture */}
+            <div className="fixed inset-0 z-[-2] h-full w-full bg-[#000000] bg-[radial-gradient(#ffffff33_1px,black_1px)] bg-[size:20px_20px]"></div>
+            
+            {/* Main Layout Container */}
+            <div className={`mx-auto w-screen min-h-screen px-6 pt-32 pb-20 md:max-w-[720px] lg:max-w-[612px] flex flex-col ${results.length > 0 ? 'justify-start' : 'justify-center'} gap-4 transition-all duration-500`}>
                 
                 <BubbleText />
 
-                <div className='text-center text-xl text-gray-100 font-normal'>
-                    {/** TODO: slot machine spiny animation to cycle through flavorTexts array */}
-                    {flavorTexts[0].split(' ').map((word, index) => {
+                <div className='text-center text-xl text-gray-100 font-normal min-h-[1.75rem]'>
+                    {flavorTexts[0] && flavorTexts[0].split(' ').map((word, index) => {
                         if (FLAVOR_KEY_WORDS.includes(word.toLowerCase())) {
                             return <span key={index} className="font-bold bg-grad text-indigo-500">{word} </span>
                         } else {
@@ -218,25 +94,65 @@ export default function Search() {
                     }
                 </div>
 
-                {/* error message and search input */}
-                <p className="flex justify-center text-white">{errorMessage}</p>
-                <div className="relative flex items-center">
-                    <input onChange={(event) => setQuery(event.target.value)} className="w-full bg-[#331E84] px-4 py-3 text-left text-lg font-normal leading-none text-gray-200 placeholder-gray-200 outline-none rounded-none" type="text" placeholder="enter an email, username, phone, ip & more..."></input>
-                    <button className="cursor-pointer bg-transparent text-white h-full w-24" onClick={handleSearch}>search</button>
+                {/* Error & Input Section */}
+                <div className="flex justify-center text-rose-400 font-mono text-sm h-6">
+                    {errorMessage && <span className="flex items-center gap-2"><AlertCircle size={14}/> {errorMessage}</span>}
                 </div>
+                
+                <div className="group relative flex items-center w-full bg-[#331E84] transition-all duration-300 focus-within:bg-[#4025a0] focus-within:ring-2 focus-within:ring-indigo-400/50 shadow-lg shadow-indigo-500/20">
+                    <input 
+                        onChange={(event) => setQuery(event.target.value)} 
+                        onKeyDown={handleKeyDown}
+                        className="flex-1 bg-transparent px-6 py-4 text-lg font-normal text-gray-100 placeholder-indigo-300/50 outline-none" 
+                        type="text" 
+                        placeholder="target identifier..." 
+                        autoFocus
+                    />
+                    <button 
+                        className="h-full px-6 text-indigo-200 hover:text-white transition-colors border-l border-indigo-500/30 flex items-center justify-center" 
+                        onClick={handleSearch}
+                        disabled={loading}
+                    >
+                        {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"/> : <SearchIcon size={22} />}
+                    </button>
+                </div>
+                
                 <div className="flex flex-wrap gap-2 justify-center">
                     {buttonCategories.map((button, index) => (
-                        <button key={index} onClick={() => handleButtonChange(button)} className={`p-2 rounded w-32 text-white cursor-pointer bg-[#5D3FD3] ${selectedButton === button ? 'bg-indigo-500' : ''}`}>{button}</button>
+                        <button 
+                            key={index} 
+                            onClick={() => handleButtonChange(button)} 
+                            className={`p-2 rounded w-32 text-white cursor-pointer bg-[#5D3FD3] transition-all hover:bg-indigo-600 ${selectedButton === button ? 'bg-indigo-500 ring-2 ring-indigo-300 ring-offset-2 ring-offset-black' : ''}`}
+                        >
+                            {button}
+                        </button>
                     ))}
                 </div>
 
-                {/* results are downloaded once set */}
-                {loading && <p className="text-white text-center">loading...</p>}
-                {results.length > 0 && <div className="flex flex-col gap-4">
+                {/* Results Display */}
+                {loading && <SearchSkeleton />}
+                
+                {results.length > 0 && !loading && (
+                    <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col gap-4">
+                        <div className="flex justify-between items-center border-b border-white/10 pb-2">
+                            <span className="text-gray-400 text-sm font-mono">
+                                Found {results.length} modules
+                            </span>
+                            <button 
+                                onClick={downloadResults}
+                                className="flex items-center gap-2 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                            >
+                                <Download size={14} /> DOWNLOAD JSON
+                            </button>
+                        </div>
 
-                </div>}
-
-
+                        <div className="flex flex-col gap-3">
+                            {results.map((result, idx) => (
+                                <ResultCard key={idx} name={result.name} data={result.data} />
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <Footer />
